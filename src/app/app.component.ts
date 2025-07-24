@@ -6,5 +6,8 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'basic-angular-app';
+  title = 'Face ID Education System';
+  activeTab = 'state';
+
+  constructor() {}
 }
