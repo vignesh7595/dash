@@ -65,6 +65,12 @@ export class DataService {
   private currentLevel = new BehaviorSubject<string>('state');
   currentLevel$ = this.currentLevel.asObservable();
 
+  private selectedDistrict = new BehaviorSubject<string>('');
+  selectedDistrict$ = this.selectedDistrict.asObservable();
+
+  private selectedSchool = new BehaviorSubject<string>('');
+  selectedSchool$ = this.selectedSchool.asObservable();
+
   private stateData = {
     attendance: [
       { id: 1, name: 'Delhi', sanctionedStrength: 65000, admittedStrength: 61500, studentRegistered: 60000, studentMarked: 57500, percentage: 95.8 },
