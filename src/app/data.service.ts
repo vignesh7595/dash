@@ -126,6 +126,24 @@ export class DataService {
     this.currentLevel.next(level);
   }
 
+  setSelectedDistrict(district: string): void {
+    this.selectedDistrict.next(district);
+  }
+
+  setSelectedSchool(school: string): void {
+    this.selectedSchool.next(school);
+  }
+
+  navigateToDistrict(districtName: string): void {
+    this.setSelectedDistrict(districtName);
+    this.setLevel('district');
+  }
+
+  navigateToSchool(schoolName: string): void {
+    this.setSelectedSchool(schoolName);
+    this.setLevel('school');
+  }
+
   getAttendanceData(): Observable<AttendanceRecord[]> {
     return new Observable(observer => {
       const level = this.currentLevel.value;
