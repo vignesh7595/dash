@@ -6,161 +6,322 @@
         <h1 class="system-title">Face ID Education System</h1>
       </div>
       <div class="date-admin">
-        <span class="current-date">07/11/2023</span>
+        <span class="current-date">{{ getCurrentDate() }}</span>
         <span class="admin-label">Admin</span>
       </div>
     </div>
   </header>
 
   <nav class="navigation-tabs">
-    <button class="nav-tab" [class.active]="activeTab === 'district'">District Level</button>
-    <button class="nav-tab active" [class.active]="activeTab === 'state'">State Level</button>
-    <button class="nav-tab" [class.active]="activeTab === 'school'">School Level</button>
+    <button 
+      class="nav-tab" 
+      [class.active]="activeTab === 'district'"
+      (click)="switchTab('district')">
+      District Level
+    </button>
+    <button 
+      class="nav-tab" 
+      [class.active]="activeTab === 'state'"
+      (click)="switchTab('state')">
+      State Level
+    </button>
+    <button 
+      class="nav-tab" 
+      [class.active]="activeTab === 'school'"
+      (click)="switchTab('school')">
+      School Level
+    </button>
   </nav>
 
   <main class="dashboard-content">
-    <div class="dashboard-title">
-      <h2>State Level Dashboard</h2>
-      <p class="dashboard-subtitle">Monitoring and tracking at state level</p>
+    <div class="loading-overlay" *ngIf="loading">
+      <div class="spinner"></div>
     </div>
 
-    <section class="attendance-section">
-      <h3 class="section-title">Student Attendance - District Wise</h3>
-      <div class="table-container">
-        <table class="attendance-table">
-          <thead>
-            <tr>
-              <th>S.No</th>
-              <th>District Name</th>
-              <th>Sanctioned Strength</th>
-              <th>Admitted Strength</th>
-              <th>Student Registered</th>
-              <th>Student Marked</th>
-              <th>Percentage</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>Delhi</td>
-              <td>65,000</td>
-              <td>61,500</td>
-              <td>60,000</td>
-              <td>57,500</td>
-              <td class="percentage-cell high">95.8%</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Mumbai</td>
-              <td>45,000</td>
-              <td>43,000</td>
-              <td>42,500</td>
-              <td>39,900</td>
-              <td class="percentage-cell high">93.9%</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>Bangalore</td>
-              <td>35,000</td>
-              <td>33,500</td>
-              <td>32,000</td>
-              <td>31,100</td>
-              <td class="percentage-cell high">97.2%</td>
-            </tr>
-            <tr>
-              <td>4</td>
-              <td>Chennai</td>
-              <td>28,000</td>
-              <td>26,500</td>
-              <td>25,000</td>
-              <td>23,800</td>
-              <td class="percentage-cell high">95.2%</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+    <div class="dashboard-title">
+      <h2>{{ activeTab | titlecase }} Level Dashboard</h2>
+      <p class="dashboard-subtitle">
+        Monitoring and tracking at {{ activeTab }} level
+      </p>
+    </div>
 
-    <section class="statistics-section">
-      <div class="stats-container">
-        <div class="stat-card schools">
-          <div class="stat-icon">🏫</div>
-          <div class="stat-number">4</div>
-          <div class="stat-label">Total Districts</div>
+    <!-- State Level Content -->
+    <div *ngIf="activeTab === 'state'">
+      <section class="attendance-section">
+        <h3 class="section-title">Student Attendance - District Wise</h3>
+        <div class="table-container">
+          <div class="table-wrapper">
+            <table class="attendance-table">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>District Name</th>
+                  <th class="hide-mobile">Sanctioned Strength</th>
+                  <th class="hide-mobile">Admitted Strength</th>
+                  <th>Student Registered</th>
+                  <th>Student Marked</th>
+                  <th>Percentage</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let record of attendanceData; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td class="district-name">{{ record.name }}</td>
+                  <td class="hide-mobile">{{ record.sanctionedStrength | number }}</td>
+                  <td class="hide-mobile">{{ record.admittedStrength | number }}</td>
+                  <td>{{ record.studentRegistered | number }}</td>
+                  <td>{{ record.studentMarked | number }}</td>
+                  <td [class]="getPercentageClass(record.percentage)">{{ record.percentage }}%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div class="stat-card students">
-          <div class="stat-icon">👥</div>
-          <div class="stat-number">149,200</div>
-          <div class="stat-label">Total Students</div>
-        </div>
-        <div class="stat-card attendance">
-          <div class="stat-icon">⚠️</div>
-          <div class="stat-number">94.6%</div>
-          <div class="stat-label">Overall Attendance</div>
-        </div>
-      </div>
-    </section>
+      </section>
 
-    <section class="employee-section">
-      <h3 class="section-title">Employee Summary - District Wise</h3>
-      <div class="table-container">
-        <table class="employee-table">
-          <thead>
-            <tr>
-              <th>S.No</th>
-              <th>District</th>
-              <th>No. of Employees</th>
-              <th>Employees Registered</th>
-              <th>Marked Attendance</th>
-              <th>Present</th>
-              <th>Absent</th>
-              <th>Late</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>Delhi</td>
-              <td>2,850</td>
-              <td>2,800</td>
-              <td>2,750</td>
-              <td>2,650</td>
-              <td>85</td>
-              <td>15</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Mumbai</td>
-              <td>2,200</td>
-              <td>2,180</td>
-              <td>2,150</td>
-              <td>2,050</td>
-              <td>85</td>
-              <td>15</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>Bangalore</td>
-              <td>1,950</td>
-              <td>1,920</td>
-              <td>1,890</td>
-              <td>1,820</td>
-              <td>55</td>
-              <td>15</td>
-            </tr>
-            <tr>
-              <td>4</td>
-              <td>Chennai</td>
-              <td>1,800</td>
-              <td>1,780</td>
-              <td>1,750</td>
-              <td>1,680</td>
-              <td>55</td>
-              <td>15</td>
-            </tr>
-          </tbody>
-        </table>
+      <section class="statistics-section">
+        <div class="stats-container">
+          <div class="stat-card schools">
+            <div class="stat-icon">🏛️</div>
+            <div class="stat-number">{{ statistics.totalUnits }}</div>
+            <div class="stat-label">Total {{ statistics.unitLabel }}</div>
+          </div>
+          <div class="stat-card students">
+            <div class="stat-icon">👥</div>
+            <div class="stat-number">{{ statistics.totalStudents | number }}</div>
+            <div class="stat-label">Total Students</div>
+          </div>
+          <div class="stat-card attendance">
+            <div class="stat-icon">📊</div>
+            <div class="stat-number">{{ statistics.overallAttendance }}%</div>
+            <div class="stat-label">Overall Attendance</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="employee-section">
+        <h3 class="section-title">Employee Summary - District Wise</h3>
+        <div class="table-container">
+          <div class="table-wrapper">
+            <table class="employee-table">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>District</th>
+                  <th class="hide-mobile">No. of Employees</th>
+                  <th class="hide-mobile">Employees Registered</th>
+                  <th>Marked Attendance</th>
+                  <th>Present</th>
+                  <th class="hide-tablet">Absent</th>
+                  <th class="hide-tablet">Late</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let record of employeeData; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td class="district-name">{{ record.name }}</td>
+                  <td class="hide-mobile">{{ record.totalEmployees | number }}</td>
+                  <td class="hide-mobile">{{ record.employeesRegistered | number }}</td>
+                  <td>{{ record.markedAttendance | number }}</td>
+                  <td>{{ record.present | number }}</td>
+                  <td class="hide-tablet">{{ record.absent }}</td>
+                  <td class="hide-tablet">{{ record.late }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- District Level Content -->
+    <div *ngIf="activeTab === 'district'">
+      <section class="attendance-section">
+        <h3 class="section-title">Student Attendance - School Wise</h3>
+        <div class="table-container">
+          <div class="table-wrapper">
+            <table class="attendance-table">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>School Name (Code)</th>
+                  <th class="hide-mobile">Sanctioned Strength</th>
+                  <th class="hide-mobile">Admitted Strength</th>
+                  <th>Student Registered</th>
+                  <th>Marked Attendance</th>
+                  <th>Percentage</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let record of attendanceData; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td class="school-name">{{ record.name }}</td>
+                  <td class="hide-mobile">{{ record.sanctionedStrength }}</td>
+                  <td class="hide-mobile">{{ record.admittedStrength }}</td>
+                  <td>{{ record.studentRegistered }}</td>
+                  <td>{{ record.studentMarked }}</td>
+                  <td [class]="getPercentageClass(record.percentage)">{{ record.percentage }}%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="statistics-section">
+        <div class="stats-container">
+          <div class="stat-card schools">
+            <div class="stat-icon">🏫</div>
+            <div class="stat-number">{{ statistics.totalUnits }}</div>
+            <div class="stat-label">Total {{ statistics.unitLabel }}</div>
+          </div>
+          <div class="stat-card students">
+            <div class="stat-icon">👥</div>
+            <div class="stat-number">{{ statistics.totalStudents }}</div>
+            <div class="stat-label">Total Students</div>
+          </div>
+          <div class="stat-card attendance">
+            <div class="stat-icon">📊</div>
+            <div class="stat-number">{{ statistics.overallAttendance }}%</div>
+            <div class="stat-label">Overall Attendance</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="principal-section">
+        <h3 class="section-title">Principal Attendance</h3>
+        <div class="table-container">
+          <div class="table-wrapper">
+            <table class="principal-table">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>School Name (Code)</th>
+                  <th>Principal</th>
+                  <th>Present</th>
+                  <th>Absent</th>
+                  <th>Late</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let record of principalData; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td class="school-name">{{ record.schoolName }}</td>
+                  <td class="principal-name">{{ record.principal }}</td>
+                  <td><span class="status-indicator" [class.active]="record.present">✓</span></td>
+                  <td><span class="status-indicator" [class.active]="record.absent">✗</span></td>
+                  <td><span class="status-indicator" [class.active]="record.late">⚠</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- School Level Content -->
+    <div *ngIf="activeTab === 'school'">
+      <div class="school-header">
+        <h3 class="school-name">Government High School</h3>
+        <p class="school-code">School Code: GHS001 | Principal: Dr. Rajesh Kumar</p>
+        <div class="school-actions">
+          <button class="action-btn">Transfer Employee</button>
+          <button class="action-btn">Manage Leave</button>
+        </div>
       </div>
-    </section>
+
+      <section class="statistics-section">
+        <div class="stats-container school-stats">
+          <div class="stat-card students">
+            <div class="stat-icon">👥</div>
+            <div class="stat-number">{{ schoolStats.totalStudents }}</div>
+            <div class="stat-label">Total Students</div>
+          </div>
+          <div class="stat-card teachers">
+            <div class="stat-icon">👨‍🏫</div>
+            <div class="stat-number">{{ schoolStats.totalTeachers }}</div>
+            <div class="stat-label">Total Teachers</div>
+          </div>
+          <div class="stat-card staff">
+            <div class="stat-icon">👷</div>
+            <div class="stat-number">{{ schoolStats.totalStaff }}</div>
+            <div class="stat-label">Total Staff</div>
+          </div>
+          <div class="stat-card attendance">
+            <div class="stat-icon">📊</div>
+            <div class="stat-number">{{ schoolStats.overallAttendance }}%</div>
+            <div class="stat-label">Overall Attendance</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="attendance-section">
+        <h3 class="section-title">Student Attendance - Class Wise</h3>
+        <p class="section-subtitle">Daily attendance monitoring by class</p>
+        <div class="table-container">
+          <div class="table-wrapper">
+            <table class="class-table">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Class</th>
+                  <th class="hide-mobile">Total Sanctioned Strength</th>
+                  <th class="hide-mobile">Admitted Strength</th>
+                  <th>No. of Students Registered</th>
+                  <th>No. of Students Marked Attendance</th>
+                  <th>Percentage of Attendance</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let record of classData; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td class="class-name">{{ record.class }}</td>
+                  <td class="hide-mobile">{{ record.totalSanctionedStrength }}</td>
+                  <td class="hide-mobile">{{ record.admittedStrength }}</td>
+                  <td>{{ record.studentsRegistered }}</td>
+                  <td>{{ record.studentsMarkedAttendance }}</td>
+                  <td [class]="getPercentageClass(record.percentageAttendance)">{{ record.percentageAttendance }}%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="employee-section">
+        <h3 class="section-title">Employee Attendance</h3>
+        <p class="section-subtitle">Daily staff attendance monitoring</p>
+        <div class="table-container">
+          <div class="table-wrapper">
+            <table class="employee-attendance-table">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Employee Name</th>
+                  <th>Designation</th>
+                  <th class="hide-mobile">Check In Time</th>
+                  <th class="hide-mobile">Check Out Time</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let record of employeeAttendanceData; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td class="employee-name">{{ record.employeeName }}</td>
+                  <td class="designation">{{ record.designation }}</td>
+                  <td class="hide-mobile">{{ record.checkInTime }}</td>
+                  <td class="hide-mobile">{{ record.checkOutTime }}</td>
+                  <td>
+                    <span class="status-badge" [class]="getStatusClass(record.status)">
+                      {{ record.status }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
   </main>
 </div>
