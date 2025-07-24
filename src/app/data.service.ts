@@ -100,7 +100,7 @@ export class DataService {
   private schoolData = {
     classes: [
       { id: 1, class: '6', totalSanctionedStrength: 50, admittedStrength: 48, studentsRegistered: 47, studentsMarkedAttendance: 45, percentageAttendance: 95.7 },
-      { id: 2, class: '7', totalSanctionedStrength: 50, admittedStrength: 47, studentRegistered: 46, studentsMarkedAttendance: 44, percentageAttendance: 95.7 },
+      { id: 2, class: '7', totalSanctionedStrength: 50, admittedStrength: 47, studentsRegistered: 46, studentsMarkedAttendance: 44, percentageAttendance: 95.7 },
       { id: 3, class: '8', totalSanctionedStrength: 50, admittedStrength: 47, studentsRegistered: 45, studentsMarkedAttendance: 43, percentageAttendance: 95.6 },
       { id: 4, class: '9', totalSanctionedStrength: 50, admittedStrength: 46, studentsRegistered: 44, studentsMarkedAttendance: 42, percentageAttendance: 95.5 },
       { id: 5, class: '10', totalSanctionedStrength: 50, admittedStrength: 47, studentsRegistered: 46, studentsMarkedAttendance: 44, percentageAttendance: 95.7 }
