@@ -15,15 +15,15 @@
   <nav class="navigation-tabs">
     <button 
       class="nav-tab" 
-      [class.active]="activeTab === 'district'"
-      (click)="switchTab('district')">
-      District Level
-    </button>
-    <button 
-      class="nav-tab" 
       [class.active]="activeTab === 'state'"
       (click)="switchTab('state')">
       State Level
+    </button>
+    <button 
+      class="nav-tab" 
+      [class.active]="activeTab === 'district'"
+      (click)="switchTab('district')">
+      District Level
     </button>
     <button 
       class="nav-tab" 
@@ -41,9 +41,26 @@
     <div class="dashboard-title">
       <h2>{{ activeTab | titlecase }} Level Dashboard</h2>
       <p class="dashboard-subtitle">
-        Monitoring and tracking at {{ activeTab }} level
+        {{ getBreadcrumb() }}
       </p>
     </div>
+
+    <!-- Search/Filter Section -->
+    <section class="search-section">
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            class="search-input" 
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+            [placeholder]="'Search ' + (activeTab === 'state' ? 'districts' : activeTab === 'district' ? 'schools or principals' : 'classes or employees') + '...'"
+          />
+          <button class="clear-search" *ngIf="searchTerm" (click)="searchTerm = ''; onSearchChange()">✕</button>
+        </div>
+      </div>
+    </section>
 
     <!-- State Level Content -->
     <div *ngIf="activeTab === 'state'">
@@ -64,9 +81,12 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let record of attendanceData; let i = index">
+                <tr *ngFor="let record of filteredAttendanceData; let i = index" class="clickable-row">
                   <td>{{ i + 1 }}</td>
-                  <td class="district-name">{{ record.name }}</td>
+                  <td class="district-name clickable" (click)="navigateToDistrict(record.name)">
+                    {{ record.name }}
+                    <span class="nav-indicator">→</span>
+                  </td>
                   <td class="hide-mobile">{{ record.sanctionedStrength | number }}</td>
                   <td class="hide-mobile">{{ record.admittedStrength | number }}</td>
                   <td>{{ record.studentRegistered | number }}</td>
@@ -75,6 +95,9 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div class="no-results" *ngIf="filteredAttendanceData.length === 0 && searchTerm">
+            No districts found matching "{{ searchTerm }}"
           </div>
         </div>
       </section>
@@ -117,9 +140,12 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let record of employeeData; let i = index">
+                <tr *ngFor="let record of filteredEmployeeData; let i = index" class="clickable-row">
                   <td>{{ i + 1 }}</td>
-                  <td class="district-name">{{ record.name }}</td>
+                  <td class="district-name clickable" (click)="navigateToDistrict(record.name)">
+                    {{ record.name }}
+                    <span class="nav-indicator">→</span>
+                  </td>
                   <td class="hide-mobile">{{ record.totalEmployees | number }}</td>
                   <td class="hide-mobile">{{ record.employeesRegistered | number }}</td>
                   <td>{{ record.markedAttendance | number }}</td>
@@ -129,6 +155,9 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div class="no-results" *ngIf="filteredEmployeeData.length === 0 && searchTerm">
+            No districts found matching "{{ searchTerm }}"
           </div>
         </div>
       </section>
@@ -153,9 +182,12 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let record of attendanceData; let i = index">
+                <tr *ngFor="let record of filteredAttendanceData; let i = index" class="clickable-row">
                   <td>{{ i + 1 }}</td>
-                  <td class="school-name">{{ record.name }}</td>
+                  <td class="school-name clickable" (click)="navigateToSchool(record.name)">
+                    {{ record.name }}
+                    <span class="nav-indicator">→</span>
+                  </td>
                   <td class="hide-mobile">{{ record.sanctionedStrength }}</td>
                   <td class="hide-mobile">{{ record.admittedStrength }}</td>
                   <td>{{ record.studentRegistered }}</td>
@@ -164,6 +196,9 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div class="no-results" *ngIf="filteredAttendanceData.length === 0 && searchTerm">
+            No schools found matching "{{ searchTerm }}"
           </div>
         </div>
       </section>
@@ -204,9 +239,12 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let record of principalData; let i = index">
+                <tr *ngFor="let record of filteredPrincipalData; let i = index" class="clickable-row">
                   <td>{{ i + 1 }}</td>
-                  <td class="school-name">{{ record.schoolName }}</td>
+                  <td class="school-name clickable" (click)="navigateToSchool(record.schoolName)">
+                    {{ record.schoolName }}
+                    <span class="nav-indicator">→</span>
+                  </td>
                   <td class="principal-name">{{ record.principal }}</td>
                   <td><span class="status-indicator" [class.active]="record.present">✓</span></td>
                   <td><span class="status-indicator" [class.active]="record.absent">✗</span></td>
@@ -215,6 +253,9 @@
               </tbody>
             </table>
           </div>
+          <div class="no-results" *ngIf="filteredPrincipalData.length === 0 && searchTerm">
+            No schools or principals found matching "{{ searchTerm }}"
+          </div>
         </div>
       </section>
     </div>
@@ -222,7 +263,7 @@
     <!-- School Level Content -->
     <div *ngIf="activeTab === 'school'">
       <div class="school-header">
-        <h3 class="school-name">Government High School</h3>
+        <h3 class="school-name">{{ selectedSchool || 'Government High School' }}</h3>
         <p class="school-code">School Code: GHS001 | Principal: Dr. Rajesh Kumar</p>
         <div class="school-actions">
           <button class="action-btn">Transfer Employee</button>
@@ -273,7 +314,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let record of classData; let i = index">
+                <tr *ngFor="let record of filteredClassData; let i = index">
                   <td>{{ i + 1 }}</td>
                   <td class="class-name">{{ record.class }}</td>
                   <td class="hide-mobile">{{ record.totalSanctionedStrength }}</td>
@@ -284,6 +325,9 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div class="no-results" *ngIf="filteredClassData.length === 0 && searchTerm">
+            No classes found matching "{{ searchTerm }}"
           </div>
         </div>
       </section>
@@ -305,7 +349,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let record of employeeAttendanceData; let i = index">
+                <tr *ngFor="let record of filteredEmployeeAttendanceData; let i = index">
                   <td>{{ i + 1 }}</td>
                   <td class="employee-name">{{ record.employeeName }}</td>
                   <td class="designation">{{ record.designation }}</td>
@@ -319,6 +363,9 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div class="no-results" *ngIf="filteredEmployeeAttendanceData.length === 0 && searchTerm">
+            No employees found matching "{{ searchTerm }}"
           </div>
         </div>
       </section>
